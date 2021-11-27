@@ -1,4 +1,4 @@
-const {  request, response } = require('express');
+const { request, response } = require('express');
 const bcrypt = require('bcryptjs');
 
 const user = require("../models/user");
@@ -6,10 +6,19 @@ const user = require("../models/user");
 //consultar basico
 const userGet = async (req = request, res = response) => {
     const { limit = 6, page = 1 } = req.query;
-    const query = {status: true};
-    const info = await user.find(query);
-    const totalUser = await user.countDocuments(query);
-    res.json(info);
+    const query = { status: true };
+    const skip = limit * (page - 1);
+    const [info, totalUsers] = await Promise.all([
+        user.find(query)
+            .skip(Number(skip))
+            .limit(Number(limit)),
+        user.countDocuments(query)
+    ]);
+
+    res.json({
+        info,
+        totalUsers
+    });
 }
 //añadir elemento
 const userPost = async (req, res) => {
