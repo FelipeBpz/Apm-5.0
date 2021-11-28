@@ -16,8 +16,8 @@ const {
 } = require('../controllers/controller.user')
 
 router.route('/')
-    .get( [basicRol('Admin', 'Vendor'),
-        validateJWT], userGet)
+    .get( [validateJWT,basicRol('Admin', 'Vendor')
+        ], userGet)
 
     .post([check('nombre', 'Campo Obligatorio').notEmpty(),
     check('password', 'La contraseña debe tener minimo 6 digitos').isLength({ min: 6 }),

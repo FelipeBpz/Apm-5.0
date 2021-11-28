@@ -18,7 +18,7 @@ const superAmd = (req, res, next) => {
     next();
 }
 
-const basicRol = (...rols) => {
+const basicRol = (...rol) => {
     return (req, res, next) => {
         if(!req.tuser){
             return res.status(500).json({
@@ -26,9 +26,9 @@ const basicRol = (...rols) => {
             })
         }
 
-        if(!rols.includes(req.tuser.rol)){
+        if(!rol.includes(req.tuser.rol)){
             return res.status(401).json({
-                msg: `${ req.user.name } no puede hacer eso`
+                msg: `${ req.tuser.nombre } no puede hacer eso`
             })
         }
 
