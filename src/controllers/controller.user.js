@@ -1,5 +1,6 @@
 const { request, response } = require('express');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const user = require("../models/user");
 
@@ -39,8 +40,40 @@ const userPost = async (req, res) => {
     console.log(newUser)
     res.json({ msg: "user Guardado" });
 }
+//login
+const userLogin = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const logUsu = await user.findOne({ email });
+        if (!logUsu) {
+            return res.status(400).json({
+                msm: "Algo salio mal"
+            })
+        }
+        if (!logUsu.status) {
+            return res.status(400).json({
+                msm: "Creo que no esta"
+            })
+        }
+        const vPass = bcrypt.compareSync(password, logUsu.password);
+        if (!vPass) {
+            return res.status(400).json({
+                msm: "Algo salio mal"
+            })
+        }
+
+        const tokenLog = jwt.sign(logUsu.toJSON(), process.env.TK_PASSWORD, {
+             expiresIn: "12h" })
+        res.json({ logUsu, tokenLog })
+    }
+
+    catch (err) {
+        res.status(500).json({ msg: "Parece que no funciona" })
+    }
+}
 //consultar con id
-/*const userGetsku = async (req, res) => {
+/*const userGetId = async (req, res) => {
     const gsProducto = await user.findById(req.params.sku);
     console.log(gsProducto)
     res.json(gsProducto);
@@ -71,5 +104,5 @@ const userDelete = async (req, res) => {
 }
 
 module.exports = {
-    userGet, userPost,/* userGetsku,*/ userPut, userDelete
+    userGet, userPost, /*userGetId,*/ userPut, userDelete, userLogin
 }
